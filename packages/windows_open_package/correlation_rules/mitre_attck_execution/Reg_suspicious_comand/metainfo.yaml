@@ -1,0 +1,30 @@
+ContentAutoName: Reg_suspicious_comand
+ExpertContext:
+  Created: 16.04.2025
+  Updated: 23.04.2025
+  KnowledgeHolders:
+    - '[05_04]'
+  Usecases: []
+  Falsepositives: []
+  References:
+    - https://attack.mitre.org/techniques/T1059/001/
+    - https://attack.mitre.org/techniques/T1562/001/
+  Improvements: []
+  DataSources:
+    - Provider: Microsoft-Windows-Sysmon
+      EventID:
+        - 1
+    - Provider: Microsoft-Windows-PowerShell
+      EventID:
+        - 4104
+ObjectId: SEC-CR-111426198
+EventDescriptions:
+  - Criteria: correlation_name = "Reg_suspicious_comand"
+    LocalizationId: corrname_Reg_suspicious_comand
+ContentRelations:
+  Implements:
+    ATTACK:
+      execution:
+        - T1059.001
+      defense-evasion:
+        - T1562.001
