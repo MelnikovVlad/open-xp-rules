@@ -1,0 +1,4 @@
+Description: 'The rule detects an attempt to change the AmsiEnable parameter inside the HKCU\Software\Microsoft\Windows Script\Settings section.'
+EventDescriptions:
+  - LocalizationId: 'corrname_Reg_suspicious_comand'
+    EventDescription: 'Process {object.proceess.name} has tried to change the AmsiEnable  on host {event_src.host}'
