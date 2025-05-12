@@ -1,4 +1,0 @@
-Description: 'Правило детектирует попытку изменения параметра AmsiEnable внутри раздела HKCU\Software\Microsoft\Windows Script\Settings'
-EventDescriptions:
-  - LocalizationId: 'corrname_Reg_suspicious_comand'
-    EventDescription: 'Процесс {object.proceess.name} попытался изменить параметр AmsiEnable на узле {event_src.host}'
