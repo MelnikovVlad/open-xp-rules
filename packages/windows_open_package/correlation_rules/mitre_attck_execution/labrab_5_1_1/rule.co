@@ -4,12 +4,15 @@ event Process_Start:
     filter {
         filter::NotFromCorrelator()
         and event_src.title == "sysmon"
-        and msgid == "1"
-        and object.process.name == "reg.exe"
+        and msgid == "10"
+        and object.property == "GrantedAccess"
+        and object.value == "0x147a"
+        and object.process.name == 'teamviewer.exe'
         and (
-            match(lower(object.process.fullpath), "?:\\windows\\sys?????\\*") 
+            regex(lower(subject.process.fullpath), 'appdata\\\\local\\\\temp', 0) != null
+            or
+            regex(lower(subject.process.fullpath), 'users', 0) != null
         )
-        and regex(lower(object.process.cmdline), 'hkcu\\\\software\\\\microsoft\\\\windows\sscript\\\\settings.*?/v\s+amsienable.*?/d\s+([^\s/]+)', 0) != null
     }
 
 event Powershell_Pipeline_Execute:
@@ -22,13 +25,16 @@ event Powershell_Pipeline_Execute:
         and event_src.title == "windows"
         and object == "command"
         and event_src.title == "sysmon"
-        and msgid == "1"
-        and object.process.name == "reg.exe"
+        and msgid == "10"
+        and object.property == "GrantedAccess"
+        and object.value == "0x147a"
+        and object.process.name == 'teamviewer.exe'
         and (
-            match(lower(object.process.fullpath), "?:\\windows\\sys?????\\*") 
+            regex(lower(subject.process.fullpath), 'appdata\\\\local\\\\temp', 0) != null
+            or
+            regex(lower(subject.process.fullpath), 'users', 0) != null
         )
-        and regex(lower(object.process.cmdline), 'hkcu\\\\software\\\\microsoft\\\\windows\sscript\\\\settings.*?/v\s+amsienable.*?/d\s+([^\s/]+)', 0) != null
-        
+
     }
 
 event Powershell_Command_Execute:
@@ -41,16 +47,19 @@ event Powershell_Command_Execute:
         and event_src.title == "windows"
         and object == "command"
         and event_src.title == "sysmon"
-        and msgid == "1"
-        and object.process.name == "reg.exe"
+        and msgid == "10"
+        and object.property == "GrantedAccess"
+        and object.value == "0x147a"
+        and object.process.name == 'teamviewer.exe'
         and (
-            match(lower(object.process.fullpath), "?:\\windows\\sys?????\\*") 
+            regex(lower(subject.process.fullpath), 'appdata\\\\local\\\\temp', 0) != null
+            or
+            regex(lower(subject.process.fullpath), 'users', 0) != null
         )
-        and regex(lower(object.process.cmdline), 'hkcu\\\\software\\\\microsoft\\\\windows\sscript\\\\settings.*?/v\s+amsienable.*?/d\s+([^\s/]+)', 0) != null
-        
+
     }
 
-rule Reg_suspicious_comand: Process_Start or Powershell_Pipeline_Execute or Powershell_Command_Execute
+rule labrab_5_1_1: Process_Start or Powershell_Pipeline_Execute or Powershell_Command_Execute
 
     init {
         $labels = "w_auto"
@@ -120,6 +129,8 @@ rule Reg_suspicious_comand: Process_Start or Powershell_Pipeline_Execute or Powe
         $event_src.subsys = event_src.subsys
         $event_src.rule = event_src.rule
         
+
+        
         $labels = $labels + "|CheckWL_Process_Creation"
     }
 
@@ -169,6 +180,8 @@ rule Reg_suspicious_comand: Process_Start or Powershell_Pipeline_Execute or Powe
         $event_src.category = event_src.category
         $event_src.rule = event_src.rule
 
+
+
         $labels = $labels + "|CheckWL_Powershell"
     }
 
@@ -206,6 +219,7 @@ rule Reg_suspicious_comand: Process_Start or Powershell_Pipeline_Execute or Powe
         $event_src.category = event_src.category
         $event_src.rule = event_src.rule
 
+
         $labels = $labels + "|CheckWL_Powershell"
     }
 
@@ -218,8 +232,8 @@ emit {
     $importance = "medium"
 
     $category.generic = "Attack"
-    $category.high = "Execution"
-    $category.low = "Command and Scripting Interpreter"
+    $category.high = ""
+    $category.low = ""
 
     $incident.aggregation.key = join([$correlation_name, $event_src.host, $subject.account.id, $subject.account.name], "|")
     $incident.severity = $importance
